@@ -1,5 +1,6 @@
 package aleixo.rafael.naruto.help.desk.rest;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +23,7 @@ public class LoginRest {
 	private LoginService loginService;
 
 	@PostMapping("")
-	UsuarioObject logar(@RequestBody ObjectLogin loginObject, HttpServletResponse response) {
+	UsuarioObject logar(@RequestBody ObjectLogin loginObject, HttpServletResponse response, ServletRequest request) {
 		try {
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			return loginService.logar(loginObject);
