@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import aleixo.rafael.naruto.help.desk.exception.NaoEncontradoException;
 import aleixo.rafael.naruto.help.desk.exception.ValidateException;
-import aleixo.rafael.naruto.help.desk.object.GenericoObject;
 import aleixo.rafael.naruto.help.desk.object.UsuarioObject;
 import aleixo.rafael.naruto.help.desk.service.UsuarioService;
 
@@ -30,33 +29,33 @@ public class UsuarioRest {
 	UsuarioService usuarioService;
 
 	@PostMapping("")
-	GenericoObject salvar(@RequestBody UsuarioObject usuarioObjectResponse, HttpServletResponse response) {
+	String salvar(@RequestBody UsuarioObject usuarioObjectResponse, HttpServletResponse response) {
 		try {
 			response.setStatus(HttpServletResponse.SC_CREATED);
-			return usuarioService.salvar(usuarioObjectResponse);
+			return usuarioService.salvar(usuarioObjectResponse).toString();
 		} catch (ValidateException e) {
 			response.setStatus(Integer.parseInt(e.getMessage()));
-			return null;
+			return e.getMessage();
 		} catch (Exception e) {
 			response.setStatus(Integer.parseInt(e.getMessage()));
-			return null;
+			return e.getMessage();
 		}
 	}
 
 	@PutMapping("")
-	GenericoObject atualizar(@RequestBody UsuarioObject usuarioObjectResponse, HttpServletResponse response) {
+	String atualizar(@RequestBody UsuarioObject usuarioObjectResponse, HttpServletResponse response) {
 		try {
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			return usuarioService.editar(usuarioObjectResponse);
 		} catch (NaoEncontradoException e) {
 			response.setStatus(400);
-			return  new GenericoObject(400, e.getMessage());
+			return e.getMessage();
 		} catch (ValidateException e) {
 			response.setStatus(Integer.parseInt(e.getMessage()));
-			return null;
+			return e.getMessage();
 		} catch (Exception e) {
 			response.setStatus(Integer.parseInt(e.getMessage()));
-			return null;
+			return e.getMessage();
 		}
 	}
 
@@ -69,6 +68,12 @@ public class UsuarioRest {
 	List<UsuarioObject> listar(@PathVariable Long idEmpresa, HttpServletResponse response) {
 		response.setStatus(HttpServletResponse.SC_OK);
 		return usuarioService.encontrarTodos(idEmpresa);
+	}
+	
+	@GetMapping("/listar/")
+	List<UsuarioObject> listarTodos(HttpServletResponse response) {
+		response.setStatus(HttpServletResponse.SC_OK);
+		return usuarioService.encontrarTodos();
 	}
 
 	@GetMapping("/id/{idUsuario}")

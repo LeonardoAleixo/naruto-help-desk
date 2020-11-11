@@ -11,9 +11,9 @@ public interface EmpresaService {
 
 	public List<EmpresaObject> encontrarTodos();
 
-	public GenericoObject salvar(EmpresaObject Empresa);
+	public String salvar(EmpresaObject Empresa);
 	
-	public GenericoObject editar(EmpresaObject Empresa);
+	public String editar(EmpresaObject Empresa);
 
 	public GenericoObject deletarPorID(Long idEmpresa);
 

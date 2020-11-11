@@ -11,9 +11,9 @@ public interface ChamadoService {
 
 	public List<ChamadoObject> encontrarTodos();
 
-	public GenericoObject salvar(ChamadoObject Chamado);
+	public String salvar(ChamadoObject Chamado);
 	
-	public GenericoObject editar(ChamadoObject Chamado);
+	public String editar(ChamadoObject Chamado);
 
 	public GenericoObject deletarPorID(Long idChamado);
 

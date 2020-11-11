@@ -33,6 +33,9 @@ public class Plano implements Serializable {
 	@Column(name = "status")
 	private Boolean status;
 
+	@Column(name = "icone")
+	private String icone;
+
 	public Integer getIdPlano() {
 		return this.idPlano;
 	}
@@ -71,6 +74,14 @@ public class Plano implements Serializable {
 
 	public void setStatus(Boolean status) {
 		this.status = status;
+	}
+
+	public String getIcone() {
+		return icone;
+	}
+
+	public void setIcone(String icone) {
+		this.icone = icone;
 	}
 
 }

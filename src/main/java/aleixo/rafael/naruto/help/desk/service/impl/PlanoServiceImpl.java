@@ -80,6 +80,7 @@ public class PlanoServiceImpl implements PlanoService {
 		plano.setNome(planoObjectResponse.getNome());
 		plano.setQuantidadeChamadoMes(planoObjectResponse.getQuantidadeChamadoMes());
 		plano.setValor(planoObjectResponse.getValor());
+		plano.setIcone(planoObjectResponse.getIcone());
 		return plano;
 	}
 
@@ -91,6 +92,7 @@ public class PlanoServiceImpl implements PlanoService {
 		planoObject.setQuantidadeChamadoMes(plano.getQuantidadeChamadoMes());
 		planoObject.setStatus(plano.getStatus());
 		planoObject.setValor(plano.getValor());
+		planoObject.setIcone(plano.getIcone());
 		return planoObject;
 	}
 

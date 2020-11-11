@@ -43,6 +43,9 @@ public class Chamado implements Serializable {
 
 	@Column(name = "titulo")
 	private String titulo;
+	
+	@Column(name = "descricao")
+	private String descricao;
 
 	public Long getIdChamado() {
 		return this.idChamado;
@@ -107,5 +110,15 @@ public class Chamado implements Serializable {
 	public void setTitulo(String titulo) {
 		this.titulo = titulo;
 	}
+
+	public String getDescricao() {
+		return descricao;
+	}
+
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
+	}
+	
+	
 
 }

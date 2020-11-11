@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 import aleixo.rafael.naruto.help.desk.exception.NaoEncontradoException;
 import aleixo.rafael.naruto.help.desk.exception.ValidateException;
 import aleixo.rafael.naruto.help.desk.object.ChamadoObject;
-import aleixo.rafael.naruto.help.desk.object.GenericoObject;
 import aleixo.rafael.naruto.help.desk.service.ChamadoService;
 
 @RestController
@@ -30,33 +29,33 @@ public class ChamadoRest {
 	ChamadoService chamadoService;
 
 	@PostMapping("")
-	GenericoObject salvar(@RequestBody ChamadoObject chamadoObjectResponse, HttpServletResponse response) {
+	String salvar(@RequestBody ChamadoObject chamadoObjectResponse, HttpServletResponse response) {
 		try {
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			return chamadoService.salvar(chamadoObjectResponse);
 		} catch (ValidateException e) {
 			response.setStatus(Integer.parseInt(e.getMessage()));
-			return null;
+			return e.getMessage();
 		} catch (Exception e) {
 			response.setStatus(Integer.parseInt(e.getMessage()));
-			return null;
+			return e.getMessage();
 		}
 	}
 
 	@PutMapping("")
-	GenericoObject atualizar(@RequestBody ChamadoObject chamadoObjectResponse, HttpServletResponse response) {
+	String atualizar(@RequestBody ChamadoObject chamadoObjectResponse, HttpServletResponse response) {
 		try {
 			response.setStatus(HttpServletResponse.SC_CREATED);
 			return chamadoService.editar(chamadoObjectResponse);
 		} catch (NaoEncontradoException e) {
 			response.setStatus(400);
-			return new GenericoObject(400, e.getMessage());
+			return e.getMessage();
 		} catch (ValidateException e) {
 			response.setStatus(Integer.parseInt(e.getMessage()));
-			return null;
+			return e.getMessage();
 		} catch (Exception e) {
 			response.setStatus(Integer.parseInt(e.getMessage()));
-			return null;
+			return e.getMessage();
 		}
 	}
 

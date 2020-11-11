@@ -1,5 +1,7 @@
 package aleixo.rafael.naruto.help.desk.object;
 
+import com.google.gson.Gson;
+
 public class UsuarioObject {
 
 	private Long idUsuario;
@@ -82,6 +84,11 @@ public class UsuarioObject {
 
 	public void setStatus(Boolean status) {
 		this.status = status;
+	}
+	
+	@Override
+	public String toString() {
+		return new Gson().toJson(this);
 	}
 
 }

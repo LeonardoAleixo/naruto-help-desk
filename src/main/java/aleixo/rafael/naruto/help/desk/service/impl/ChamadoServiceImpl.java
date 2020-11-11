@@ -14,12 +14,20 @@ import aleixo.rafael.naruto.help.desk.object.ChamadoObject;
 import aleixo.rafael.naruto.help.desk.object.GenericoObject;
 import aleixo.rafael.naruto.help.desk.repository.ChamadoRepository;
 import aleixo.rafael.naruto.help.desk.service.ChamadoService;
+import aleixo.rafael.naruto.help.desk.service.EmpresaService;
+import aleixo.rafael.naruto.help.desk.validation.ChamadoValidator;
 
 @Service
 public class ChamadoServiceImpl implements ChamadoService {
 
 	@Autowired
 	private ChamadoRepository chamadoRepository;
+
+	@Autowired
+	private ChamadoValidator chamadoValidator;
+	
+	@Autowired
+	private EmpresaService empresaService;
 
 	@Override
 	public ChamadoObject encontrarPorID(Long idChamado) {
@@ -42,20 +50,29 @@ public class ChamadoServiceImpl implements ChamadoService {
 	}
 
 	@Override
-	public GenericoObject salvar(ChamadoObject chamadoObject) {
-		Chamado chamado = preencherChamado(chamadoObject);
-		chamadoRepository.save(chamado);
-		return new GenericoObject(200);
+	public String salvar(ChamadoObject chamadoObject) {
+		try {
+			Chamado chamado = preencherChamado(chamadoObject);
+			chamadoRepository.save(chamado);
+			return preencherChamadoObjectResponse(chamado).toString();
+		} catch (Exception e) {
+			return e.getMessage();
+		}
 	}
 
 	@Override
-	public GenericoObject editar(ChamadoObject chamadoObject) {
-		Chamado chamado = preencherChamado(chamadoObject);
-		if (chamado.getIdChamado() == null) {
-			throw new NaoEncontradoException("Id não encontrado");
+	public String editar(ChamadoObject chamadoObject) {
+		try {
+			Chamado chamado = preencherChamado(chamadoObject);
+			if (chamado.getIdChamado() == null) {
+				throw new NaoEncontradoException("Id não encontrado");
+			}
+			chamadoRepository.save(chamado);
+			return preencherChamadoObjectResponse(chamado).toString();
+		} catch (Exception e) {
+			return e.getMessage();
 		}
-		chamadoRepository.save(chamado);
-		return new GenericoObject(200);
+
 	}
 
 	@Override
@@ -76,19 +93,25 @@ public class ChamadoServiceImpl implements ChamadoService {
 
 	@Override
 	public Chamado preencherChamado(ChamadoObject chamadoObjectResponse) {
-		Chamado chamado = new Chamado();
-		chamado.setAtendente(chamadoObjectResponse.getAtendente());
-		chamado.setCliente(chamadoObjectResponse.getCliente());
-		chamado.setDataInicio(
-				chamadoObjectResponse.getDataInicio() != null ? new Date(chamadoObjectResponse.getDataInicio()) : null);
-		chamado.setDataTermino(
-				chamadoObjectResponse.getDataTermino() != null ? new Date(chamadoObjectResponse.getDataTermino())
-						: null);
-		chamado.setIdChamado(chamadoObjectResponse.getIdChamado());
-		chamado.setSetor(chamadoObjectResponse.getSetor());
-		chamado.setStatus(chamadoObjectResponse.getStatus());
-		chamado.setTitulo(chamadoObjectResponse.getTitulo());
-		return chamado;
+		if (chamadoValidator.validateChamado(chamadoObjectResponse)) {
+			Chamado chamado = new Chamado();
+			chamado.setAtendente(chamadoObjectResponse.getAtendente());
+			chamado.setCliente(chamadoObjectResponse.getCliente());
+			chamado.setDataInicio(
+					chamadoObjectResponse.getDataInicio() != null ? new Date(chamadoObjectResponse.getDataInicio())
+							: null);
+			chamado.setDataTermino(
+					chamadoObjectResponse.getDataTermino() != null ? new Date(chamadoObjectResponse.getDataTermino())
+							: null);
+			chamado.setIdChamado(chamadoObjectResponse.getIdChamado());
+			chamado.setSetor(chamadoObjectResponse.getSetor());
+			chamado.setStatus(chamadoObjectResponse.getStatus() == null ? 1 : chamadoObjectResponse.getStatus());
+			chamado.setTitulo(chamadoObjectResponse.getTitulo());
+			chamado.setDescricao(chamadoObjectResponse.getDescricao());
+			return chamado;
+		}
+		return null;
+
 	}
 
 	@Override
@@ -102,6 +125,8 @@ public class ChamadoServiceImpl implements ChamadoService {
 		chamadoObject.setSetor(chamado.getSetor());
 		chamadoObject.setStatus(chamado.getStatus());
 		chamadoObject.setTitulo(chamado.getTitulo());
+		chamadoObject.setDescricao(chamado.getDescricao());
+		chamadoObject.setEmpresa(empresaService.encontrarPorID(chamado.getCliente()));
 		return chamadoObject;
 	}
 

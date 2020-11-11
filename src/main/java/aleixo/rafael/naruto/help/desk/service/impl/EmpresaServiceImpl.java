@@ -8,11 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import aleixo.rafael.naruto.help.desk.exception.NaoEncontradoException;
+import aleixo.rafael.naruto.help.desk.exception.ValidateException;
 import aleixo.rafael.naruto.help.desk.model.Empresa;
 import aleixo.rafael.naruto.help.desk.object.EmpresaObject;
 import aleixo.rafael.naruto.help.desk.object.GenericoObject;
 import aleixo.rafael.naruto.help.desk.repository.EmpresaRepository;
 import aleixo.rafael.naruto.help.desk.service.EmpresaService;
+import aleixo.rafael.naruto.help.desk.validation.EmpresaValidator;
 
 @Service
 public class EmpresaServiceImpl implements EmpresaService {
@@ -20,13 +22,16 @@ public class EmpresaServiceImpl implements EmpresaService {
 	@Autowired
 	private EmpresaRepository empresaRepository;
 
+	@Autowired
+	private EmpresaValidator empresaValidator;
+
 	@Override
 	public EmpresaObject encontrarPorID(Long idEmpresa) {
 		Optional<Empresa> empresa = empresaRepository.findById(idEmpresa);
 		if (empresa.isPresent()) {
 			return preencherEmpresaObjectResponse(empresa.get());
 		} else {
-			throw new NaoEncontradoException("Usuário não encontrado");
+			throw new NaoEncontradoException("Empresa não encontrado");
 		}
 	}
 
@@ -41,20 +46,36 @@ public class EmpresaServiceImpl implements EmpresaService {
 	}
 
 	@Override
-	public GenericoObject salvar(EmpresaObject empresaObject) {
-		Empresa empresa = preencherEmpresa(empresaObject);
-		empresaRepository.save(empresa);
-		return new GenericoObject(200);
+	public String salvar(EmpresaObject empresaObject) {
+		try {
+			Optional<Empresa> temp = empresaRepository.encontrarPorCnpjEqual(empresaObject.getCnpj());
+			if (temp.isPresent()) {
+				throw new ValidateException("Cnpj já está sendo utilizado");
+			}
+			Empresa empresa = preencherEmpresa(empresaObject);
+			empresaRepository.save(empresa);
+			return preencherEmpresaObjectResponse(empresa).toString();
+		} catch (Exception e) {
+			return e.getMessage();
+		}
 	}
 
 	@Override
-	public GenericoObject editar(EmpresaObject empresaObject) {
-		Empresa empresa = preencherEmpresa(empresaObject);
-		if (empresa.getIdEmpresa() == null) {
-			throw new NaoEncontradoException("Id não encontrado");
+	public String editar(EmpresaObject empresaObject) {
+		try {
+			Optional<Empresa> temp = empresaRepository.encontrarPorCnpjEqual(empresaObject.getCnpj());
+			if (temp.isPresent() && temp.get().getIdEmpresa() != empresaObject.getIdEmpresa()) {
+				throw new ValidateException("Cnpj já está sendo utilizado");
+			}
+			Empresa empresa = preencherEmpresa(empresaObject);
+			if (empresa.getIdEmpresa() == null) {
+				throw new NaoEncontradoException("Id não encontrado");
+			}
+			empresaRepository.save(empresa);
+			return preencherEmpresaObjectResponse(empresa).toString();
+		} catch (Exception e) {
+			return e.getMessage();
 		}
-		empresaRepository.save(empresa);
-		return new GenericoObject(200);
 	}
 
 	@Override
@@ -75,12 +96,16 @@ public class EmpresaServiceImpl implements EmpresaService {
 
 	@Override
 	public Empresa preencherEmpresa(EmpresaObject empresaObjectResponse) {
-		Empresa empresa = new Empresa();
-		empresa.setIdEmpresa(empresaObjectResponse.getIdEmpresa());
-		empresa.setNome(empresaObjectResponse.getNome());
-		empresa.setPlano(empresaObjectResponse.getPlano());
-		empresa.setStatus(empresaObjectResponse.getStatus());
-		return empresa;
+		if (empresaValidator.validateEmpresa(empresaObjectResponse)) {
+			Empresa empresa = new Empresa();
+			empresa.setIdEmpresa(empresaObjectResponse.getIdEmpresa());
+			empresa.setNome(empresaObjectResponse.getNome());
+			empresa.setPlano(empresaObjectResponse.getPlano());
+			empresa.setStatus(empresaObjectResponse.getStatus() == null ? true : empresaObjectResponse.getStatus());
+			empresa.setCnpj(empresaObjectResponse.getCnpj());
+			return empresa;
+		}
+		return null;
 	}
 
 	@Override
@@ -90,6 +115,7 @@ public class EmpresaServiceImpl implements EmpresaService {
 		empresaObject.setNome(empresa.getNome());
 		empresaObject.setPlano(empresa.getPlano());
 		empresaObject.setStatus(empresa.getStatus());
+		empresaObject.setCnpj(empresa.getCnpj());
 		return empresaObject;
 	}
 

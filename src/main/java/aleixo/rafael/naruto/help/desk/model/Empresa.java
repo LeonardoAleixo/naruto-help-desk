@@ -30,6 +30,9 @@ public class Empresa implements Serializable {
 	@Column(name = "status")
 	private Boolean status;
 
+	@Column(name = "cnpj")
+	private String cnpj;
+
 	public Long getIdEmpresa() {
 		return this.idEmpresa;
 	}
@@ -60,6 +63,14 @@ public class Empresa implements Serializable {
 
 	public void setStatus(Boolean status) {
 		this.status = status;
+	}
+
+	public String getCnpj() {
+		return cnpj;
+	}
+
+	public void setCnpj(String cnpj) {
+		this.cnpj = cnpj;
 	}
 
 }
